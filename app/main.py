@@ -2,6 +2,8 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from routes import routers
+
 app = FastAPI()
 
 # Configure CORS
@@ -12,6 +14,7 @@ app.add_middleware(
     allow_headers=["*"],  # Set this to the appropriate list of allowed headers
 )
 
+app.include_router(routers['users'], prefix='/users')
 @app.get("/")
 def ping():
     return {"message": "Ok"}

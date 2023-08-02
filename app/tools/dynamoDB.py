@@ -7,7 +7,7 @@ import uuid
 from passlib.context import CryptContext
 from dotenv import load_dotenv
 
-from app.models.User import User
+from models.User import User
 
 load_dotenv()
 
