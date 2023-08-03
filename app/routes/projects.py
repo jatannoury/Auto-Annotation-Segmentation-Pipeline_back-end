@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import  APIRouter,HTTPException
 
 from models.AuthProject import AuthProject
@@ -14,7 +16,7 @@ def create_project(formData: Project):
         project_id = dynamoDB_handler.create_project(formData)
         return {"message": "Project created successfully!", "project_id":project_id}
     except:
-        raise HTTPException(status_code=401)
+        raise HTTPException(status_code=400)
 
 @router.post("/authenticate", status_code=200)
 def authenticate_project(formData: AuthProject):

@@ -1,4 +1,4 @@
-from fastapi import  APIRouter,HTTPException
+from fastapi import  APIRouter,HTTPException,Response
 
 from models.SignIn import SignIn
 from models.User import User
@@ -17,7 +17,7 @@ def sign_up(formData: User):
         raise HTTPException(status_code=401)
 
 @router.post("/login", status_code=200)
-def sign_in(formData: SignIn):
+def sign_in(formData: SignIn, response:Response):
     user_info = formData.__dict__
     db_response = dynamoDB_handler.get_user_info(user_info['email'])
     try:
@@ -26,6 +26,8 @@ def sign_in(formData: SignIn):
             del db_response['Items'][0]['password']
             return {"message":"Correct credentials","user_info":db_response['Items']}
         else:
-            raise HTTPException(status_code=401)
+            response.status_code=401
+            return {"message":"Wrong Credentials"}
     except:
-        raise HTTPException(status_code=401)
+        response.status_code = 401
+        return {"message": "Wrong Credentials"}

@@ -5,8 +5,7 @@ import re
 class User(BaseModel):
     firstName: str
     lastName: str
-    birthday: str
-    gender: str
+    birthday: str; gender: str
     email: str
     password: str
 

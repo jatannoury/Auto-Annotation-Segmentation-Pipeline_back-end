@@ -65,6 +65,7 @@ class DynamoDbHandler:
         try:
             project_info = project_info.__dict__
             project_info['project_id'] = str(uuid.uuid4())
+            project_info['createdAt'] = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             project_info['status'] = "Pending"
             if project_info['password'] != "" or project_info['password'] != None:
                 project_info['password'] = self.encrypt_password(project_info['password'])
