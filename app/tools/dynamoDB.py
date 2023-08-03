@@ -84,6 +84,22 @@ class DynamoDbHandler:
             FilterExpression=filter_expression,
             ExpressionAttributeValues=expression_attribute_values
         )
+    def get_projects_by_user_id(self,user_id:str):
+        try:
+            print(user_id)
+            filter_expression = 'userId = :user_id'
+            expression_attribute_values = {
+                ":user_id": user_id
+            }
+            return self.projects_table.scan(
+                FilterExpression=filter_expression,
+                ExpressionAttributeValues=expression_attribute_values
+            )
+
+
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=500, detail="Internal Server Error")
 
 if __name__ == "__main__":
     dynamoDB_handler = DynamoDbHandler()

@@ -1,6 +1,6 @@
 import datetime
 
-from fastapi import  APIRouter,HTTPException
+from fastapi import  APIRouter,HTTPException,Query
 
 from models.AuthProject import AuthProject
 from models.Project import Project
@@ -29,6 +29,14 @@ def authenticate_project(formData: AuthProject):
             return {"message": "Correct credentials"}
         else:
             raise HTTPException(status_code=401)
+    except:
+        raise HTTPException(status_code=401)
+
+@router.get("/projects", status_code=200)
+def get_projects(user_id:str = Query(..., description="user_id")):
+    try:
+        db_response = dynamoDB_handler.get_projects_by_user_id(user_id)
+        return db_response
     except:
         raise HTTPException(status_code=401)
 
