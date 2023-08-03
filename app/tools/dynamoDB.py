@@ -100,6 +100,16 @@ class DynamoDbHandler:
         except Exception as e:
             print(e)
             raise HTTPException(status_code=500, detail="Internal Server Error")
+    def delete_project(self,project_id:str):
+        try:
+            response = self.projects_table.delete_item(
+                Key={
+                    "project_id": project_id
+                }
+            )
+            return response
+        except:
+            raise HTTPException(status_code=500,detail="Internal Server Error")
 
 if __name__ == "__main__":
     dynamoDB_handler = DynamoDbHandler()

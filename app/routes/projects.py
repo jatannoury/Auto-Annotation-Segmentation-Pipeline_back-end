@@ -36,7 +36,16 @@ def authenticate_project(formData: AuthProject):
 def get_projects(user_id:str = Query(..., description="user_id")):
     try:
         db_response = dynamoDB_handler.get_projects_by_user_id(user_id)
-        return db_response
+        return {"items_count":db_response['Count'],"data":db_response['Items']}
+    except:
+        raise HTTPException(status_code=401)
+
+@router.delete("/", status_code=200)
+def delete_project(project_id:str = Query(..., description="project_id")):
+    try:
+        db_response = dynamoDB_handler.delete_project(project_id)
+        print(db_response)
+        return "Project Deleted"
     except:
         raise HTTPException(status_code=401)
 
