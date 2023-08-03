@@ -7,6 +7,8 @@ import uuid
 from passlib.context import CryptContext
 from dotenv import load_dotenv
 
+from models.AuthProject import AuthProject
+from models.Project import Project
 from models.User import User
 
 load_dotenv()
@@ -21,6 +23,7 @@ class DynamoDbHandler:
             aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY")
         )
         self.users_table = dynamo_db_client.Table("users")
+        self.projects_table = dynamo_db_client.Table("projects")
 
     # Password encryption function
     def encrypt_password(self, password: str) -> str:
@@ -58,6 +61,28 @@ class DynamoDbHandler:
             print(e)
             raise HTTPException(status_code=500, detail="Internal Server Error")
 
+    def create_project(self,project_info:Project):
+        try:
+            project_info = project_info.__dict__
+            project_info['project_id'] = str(uuid.uuid4())
+            project_info['status'] = "Pending"
+            if project_info['password'] != "" or project_info['password'] != None:
+                project_info['password'] = self.encrypt_password(project_info['password'])
+            self.projects_table.put_item(Item=project_info)
+            return project_info['project_id']
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=500, detail="Internal Server Error")
+
+    def get_table_info(self,project_id):
+        filter_expression = 'project_id = :id'
+        expression_attribute_values = {
+            ":id": project_id
+        }
+        return self.projects_table.scan(
+            FilterExpression=filter_expression,
+            ExpressionAttributeValues=expression_attribute_values
+        )
 
 if __name__ == "__main__":
     dynamoDB_handler = DynamoDbHandler()

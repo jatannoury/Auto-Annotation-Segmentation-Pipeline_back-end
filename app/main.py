@@ -14,7 +14,9 @@ app.add_middleware(
     allow_headers=["*"],  # Set this to the appropriate list of allowed headers
 )
 
+
 app.include_router(routers['users'], prefix='/users')
+app.include_router(routers['project'], prefix='/project')
 @app.get("/")
 def ping():
     return {"message": "Ok"}
