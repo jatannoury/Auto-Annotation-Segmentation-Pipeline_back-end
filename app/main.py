@@ -17,6 +17,7 @@ app.add_middleware(
 
 app.include_router(routers['users'], prefix='/users')
 app.include_router(routers['project'], prefix='/project')
+app.include_router(routers['instant_prediction'], prefix='/ml_models/instant_prediction')
 @app.get("/")
 def ping():
     return {"message": "Ok"}

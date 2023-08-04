@@ -44,8 +44,7 @@ def get_projects(user_id:str = Query(..., description="user_id")):
 def delete_project(project_id:str = Query(..., description="project_id")):
     try:
         db_response = dynamoDB_handler.delete_project(project_id)
-        print(db_response)
-        return "Project Deleted"
+        return {"message":"Project Deleted","project_id":project_id}
     except:
         raise HTTPException(status_code=401)
 
