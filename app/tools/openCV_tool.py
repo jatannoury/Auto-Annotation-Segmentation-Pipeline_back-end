@@ -1,7 +1,6 @@
 import cv2
 import random
 
-
 def random_bounding_box(image):
     height, width, _ = image.shape
 

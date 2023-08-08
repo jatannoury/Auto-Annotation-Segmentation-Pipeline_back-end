@@ -1,9 +1,15 @@
 import datetime
+from typing import List, Dict
+import httpx
 
-from fastapi import  APIRouter,HTTPException,Query
+import requests
+from fastapi import APIRouter, HTTPException, Query, UploadFile
+from pydantic import BaseModel
 
+from config.lambda_functions_URLs import RUN_PROJECT_ORCHESTRATOR_URL
 from models.AuthProject import AuthProject
 from models.Project import Project
+from models.RunningProject import RunningProject
 from tools.dynamoDB import DynamoDbHandler
 
 
@@ -50,4 +56,11 @@ def delete_project(project_id:str = Query(..., description="project_id")):
 
 
 
-
+@router.post("/start-project", status_code=201)
+async def start_project(running_project: RunningProject):
+    try:
+        project_id = await dynamoDB_handler.create_running_project(running_project)
+        print(project_id)
+        return {"message": "Project Running", "project_id": project_id}
+    except:
+        raise HTTPException(status_code=500)

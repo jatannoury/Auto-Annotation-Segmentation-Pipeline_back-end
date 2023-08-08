@@ -3,7 +3,7 @@ from pydantic import BaseModel, validator
 
 class Project(BaseModel):
     projectName: str
-    totalNumber: int
+    storageType: str
     password: str
     userId:str
     protect:bool

@@ -28,6 +28,7 @@ def sign_in(formData: SignIn, response:Response):
         else:
             response.status_code=401
             return {"message":"Wrong Credentials"}
-    except:
-        response.status_code = 401
+    except Exception as e:
+        print(e)
+        response.status_code = 500
         return {"message": "Wrong Credentials"}

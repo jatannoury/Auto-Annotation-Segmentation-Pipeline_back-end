@@ -9,7 +9,10 @@ from dotenv import load_dotenv
 
 from models.AuthProject import AuthProject
 from models.Project import Project
+from models.RunningProject import RunningProject
 from models.User import User
+import requests
+from config.lambda_functions_URLs import RUN_PROJECT_ORCHESTRATOR_URL
 
 load_dotenv()
 
@@ -24,6 +27,7 @@ class DynamoDbHandler:
         )
         self.users_table = dynamo_db_client.Table("users")
         self.projects_table = dynamo_db_client.Table("projects")
+        self.running_projects_table = dynamo_db_client.Table("running_projects")
 
     # Password encryption function
     def encrypt_password(self, password: str) -> str:
@@ -110,6 +114,20 @@ class DynamoDbHandler:
             return response
         except:
             raise HTTPException(status_code=500,detail="Internal Server Error")
+
+    async def create_running_project(self,project_info:RunningProject):
+        try:
+            project_info = project_info.__dict__
+            print(project_info)
+            created_instance_id = requests.post(f"{RUN_PROJECT_ORCHESTRATOR_URL}?project_name={project_info['project_name']}&user_id={project_info['userId']}")
+            project_info['created_instance_id'] = created_instance_id.text
+            project_info['created_at'] = f"{datetime.datetime.utcnow()}"
+            self.running_projects_table.put_item(Item=project_info)
+            return project_info['project_id']
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=500, detail="Internal Server Error")
+
 
 if __name__ == "__main__":
     dynamoDB_handler = DynamoDbHandler()
