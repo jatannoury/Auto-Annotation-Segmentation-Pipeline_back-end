@@ -19,8 +19,8 @@ router = APIRouter()
 @router.post("/create", status_code=201)
 def create_project(formData: Project):
     try:
-        project_id = dynamoDB_handler.create_project(formData)
-        return {"message": "Project created successfully!", "project_id":project_id}
+        project_info = dynamoDB_handler.create_project(formData)
+        return {"message": "Project created successfully!", "project_info":project_info}
     except:
         raise HTTPException(status_code=400)
 

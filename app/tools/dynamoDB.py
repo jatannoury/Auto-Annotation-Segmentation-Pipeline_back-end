@@ -74,7 +74,7 @@ class DynamoDbHandler:
             if project_info['password'] != "" or project_info['password'] != None:
                 project_info['password'] = self.encrypt_password(project_info['password'])
             self.projects_table.put_item(Item=project_info)
-            return project_info['project_id']
+            return project_info
         except Exception as e:
             print(e)
             raise HTTPException(status_code=500, detail="Internal Server Error")
@@ -119,10 +119,11 @@ class DynamoDbHandler:
         try:
             project_info = project_info.__dict__
             print(project_info)
-            created_instance_id = requests.post(f"{RUN_PROJECT_ORCHESTRATOR_URL}?project_name={project_info['project_name']}&user_id={project_info['userId']}")
-            project_info['created_instance_id'] = created_instance_id.text
             project_info['created_at'] = f"{datetime.datetime.utcnow()}"
+            project_info['finished_at'] = ""
             self.running_projects_table.put_item(Item=project_info)
+            created_instance_id = requests.post(f"{RUN_PROJECT_ORCHESTRATOR_URL}?project_name={project_info['project_name']}&user_id={project_info['userId']}")
+            # project_info['created_instance_id'] = created_instance_id.text
             return project_info['project_id']
         except Exception as e:
             print(e)
