@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image
 import io
 from fastapi import APIRouter, File, UploadFile, HTTPException, Form
-import cv2
+# import cv2
 from fastapi.responses import JSONResponse
 
 from tools.openCV_tool import random_bounding_box
@@ -22,21 +22,21 @@ model = Model()
 router = APIRouter()
 
 @router.post("/single", status_code=201)
-async def upload_image(file:bytes= File(...)):
-    allowed_extensions = [".jpeg", ".png", ".jpg",".avif"]
+async def upload_image(file= File(...)):
+    uuid_val = uuid.uuid4()
+    upload_dir = f"uploads/uploads_{uuid_val}"
+    os.makedirs(upload_dir, exist_ok=True)
+    file_name = file.filename
+    file = await file.read()
     image = Image.open(io.BytesIO(file))
-    image = np.array(image)  # Convert PIL Image to numpy array
-    image_with_bbox = random_bounding_box(image)
-    for extension in allowed_extensions:
-        try:
-            _, buffer = cv2.imencode(extension, cv2.cvtColor(image_with_bbox, cv2.COLOR_RGB2BGR))
-        except:
-            continue
-
-    # Encode the bytes as base64
-    image_base64 = base64.b64encode(buffer).decode('utf-8')
-
-    return JSONResponse(content={"uploadStatus": "complete", "image": image_base64},status_code=201)
+    file_path = os.path.join(upload_dir, file_name)
+    image.save(file_path)
+    model.segment(input_dir=upload_dir)
+    with open(f"segmentation/{uuid_val}/{file_name}", 'rb') as text_file:
+        text_binary = text_file.read()
+    with open(f"segmentation/{uuid_val}/labels/{'.'.join(file_name.split('.')[:-1])}.txt", 'rb') as text_file:
+        label = text_file.read()
+    return JSONResponse(content={"uploadStatus": "complete", "image": base64.b64encode(text_binary).decode('utf-8'),"labels":[base64.b64encode(label).decode('utf-8')]},status_code=201)
 def is_valid_image(file) -> bool:
     try:
         Image.open(file)
